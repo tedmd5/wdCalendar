@@ -41,7 +41,9 @@
                 url: DATA_FEED_URL + "?method=list",  
                 quickAddUrl: DATA_FEED_URL + "?method=add", 
                 quickUpdateUrl: DATA_FEED_URL + "?method=update",
-                quickDeleteUrl: DATA_FEED_URL + "?method=remove"        
+                quickDeleteUrl: DATA_FEED_URL + "?method=remove",
+                quickUndoUrl: DATA_FEED_URL + "?method=undo",
+                quickRedoUrl: DATA_FEED_URL + "?method=redo"
             };
             var $dv = $("#calhead");
             var _MH = document.documentElement.clientHeight;
@@ -177,6 +179,14 @@
             $("#showreflashbtn").click(function(e){
                 $("#gridcontainer").reload();
             });
+
+            $("#showundobtn").click(function(e){
+                $("#gridcontainer").undo();
+            });
+            
+            $("#showredobtn").click(function(e){
+                $("#gridcontainer").redo();
+            });
             
             //Add a new event
             $("#faddbtn").click(function(e) {
@@ -247,6 +257,14 @@
             <div class="btnseparator"></div>
               <div  id="showreflashbtn" class="fbutton">
                 <div><span title='Refresh view' class="showdayflash">Refresh</span></div>
+                </div>
+            <div class="btnseparator"></div>
+              <div  id="showundobtn" class="fbutton">
+                <div><span title='Undo' class="showundoflash">Undo</span></div>
+                </div>
+            <div class="btnseparator"></div>
+              <div  id="showredobtn" class="fbutton">
+                <div><span title='Redo' class="showredoflash">Redo</span></div>
                 </div>
              <div class="btnseparator"></div>
             <div id="sfprevbtn" title="Prev"  class="fbutton">

@@ -69,7 +69,7 @@ function listCalendarByRange($sd, $ed){
     $db = new DBConnection();
     $db->getConnection();
     $sql = "select * from `jqcalendar` where `starttime` between '"
-      .php2MySqlTime($sd)."' and '". php2MySqlTime($ed)."' ORDER BY starttime ASC";
+      .php2MySqlTime($sd)."' and '". php2MySqlTime($ed)."'";
     $handle = mysql_query($sql);
     //echo $sql;
     while ($row = mysql_fetch_object($handle)) {
@@ -85,7 +85,7 @@ function listCalendarByRange($sd, $ed){
         php2JsTime(mySql2PhpTime($row->StartTime)),
         php2JsTime(mySql2PhpTime($row->EndTime)),
         $row->IsAllDayEvent,
-        ($row->IsAllDayEvent!=1 && date("Y-m-d",mySql2PhpTime($row->EndTime))>date("Y-m-d",mySql2PhpTime($row->StartTime))?1:0), //more than one day event
+        0, //more than one day event
         //$row->InstanceType,
         0,//Recurring event,
         $row->Color,
@@ -228,6 +228,14 @@ switch ($method) {
                 $_POST["Location"], $_POST["colorvalue"], $_POST["timezone"]);
         }        
         break; 
+    case "undo":
+	$v['result']="ok";
+        $ret = $v;
+        break;
+    case "redo":
+	$v['result']="ok";
+        $ret = $v;
+        break;
 
 
 }

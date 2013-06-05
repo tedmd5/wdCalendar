@@ -198,6 +198,16 @@ span.showdayflash
     padding-left:20px;
     background:url("./images/icons/date_reflash.png") no-repeat 1px 50%;
 }
+span.showundoflash
+{
+    padding-left:20px;
+    background:url("./images/icons/undo.png") no-repeat 1px 50%;
+}
+span.showredoflash
+{
+    padding-left:20px;
+    background:url("./images/icons/redo.png") no-repeat 1px 50%;
+}
 .size1
 {
     width:50px;    

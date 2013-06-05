@@ -127,7 +127,7 @@ if($_GET["id"]){
                 }
             });
             
-           $("#stpartdate,#etpartdate").datepicker({ picker: "<button class='picker'></button>"});
+           $("#stpartdate,#etpartdate").datepicker({ picker: "<button class='calpick'></button>"});    
             var cv =$("#colorvalue").val() ;
             if(cv=="")
             {
@@ -178,7 +178,16 @@ if($_GET["id"]){
             }
         });
     </script>      
-
+    <style type="text/css">     
+    .calpick     {        
+        width:16px;   
+        height:16px;     
+        border:none;        
+        cursor:pointer;        
+        background:url("sample-css/cal.gif") no-repeat center 2px;        
+        margin-left:-22px;    
+    }      
+    </style>
   </head>
   <body>    
     <div>      
@@ -214,25 +223,16 @@ if($_GET["id"]){
             <span>*Time:
             </span>                    
             <div>  
-              <?php
-                $all_day_event=false;
-                if(isset($event)){
+              <?php if(isset($event)){
                   $sarr = explode(" ", php2JsTime(mySql2PhpTime($event->StartTime)));
                   $earr = explode(" ", php2JsTime(mySql2PhpTime($event->EndTime)));
-                  $all_day_event=$event->IsAllDayEvent;
-                }
-                elseif(isset($_GET['start']) && $_GET['start']!=-360){
-                    $sarr = explode(" ",$_GET['start']);
-                    $earr = explode(" ",$_GET['end']);
-                    $all_day_event=($sarr[1]=="00:00" && $earr[1]=="00:00");
-                  }
-                ?>
-              <input MaxLength="10" class="required date" id="stpartdate" name="stpartdate" style="padding-left:2px;width:90px;" type="text" value="<?php echo isset($sarr[0])?$sarr[0]:""; ?>" />
-              <input MaxLength="5" class="required time" id="stparttime" name="stparttime" style="width:40px;" type="text" value="<?php echo isset($sarr[1])?$sarr[1]:""; ?>" />To
-              <input MaxLength="10" class="required date" id="etpartdate" name="etpartdate" style="padding-left:2px;width:90px;" type="text" value="<?php echo isset($earr[0])?$earr[0]:""; ?>" />
-              <input MaxLength="50" class="required time" id="etparttime" name="etparttime" style="width:40px;" type="text" value="<?php echo isset($earr[1])?$earr[1]:""; ?>" />
+              }?>                    
+              <input MaxLength="10" class="required date" id="stpartdate" name="stpartdate" style="padding-left:2px;width:90px;" type="text" value="<?php echo isset($event)?$sarr[0]:""; ?>" />                       
+              <input MaxLength="5" class="required time" id="stparttime" name="stparttime" style="width:40px;" type="text" value="<?php echo isset($event)?$sarr[1]:""; ?>" />To                       
+              <input MaxLength="10" class="required date" id="etpartdate" name="etpartdate" style="padding-left:2px;width:90px;" type="text" value="<?php echo isset($event)?$earr[0]:""; ?>" />                       
+              <input MaxLength="50" class="required time" id="etparttime" name="etparttime" style="width:40px;" type="text" value="<?php echo isset($event)?$earr[1]:""; ?>" />                                            
               <label class="checkp"> 
-                <input id="IsAllDayEvent" name="IsAllDayEvent" type="checkbox" value="1" <?php if($all_day_event) {echo "checked";} ?>/>          All Day Event
+                <input id="IsAllDayEvent" name="IsAllDayEvent" type="checkbox" value="1" <?php if(isset($event)&&$event->IsAllDayEvent!=0) {echo "checked";} ?>/>          All Day Event                      
               </label>                    
             </div>                
           </label>                 
@@ -250,7 +250,7 @@ if($_GET["id"]){
           </label>                
           <input id="timezone" name="timezone" type="hidden" value="" />           
         </form>         
-      </div>    
+      </div>         
     </div>
   </body>
 </html>

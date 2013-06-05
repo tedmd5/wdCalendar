@@ -219,6 +219,16 @@
              */
             quickDeleteUrl: "", 
             /**
+             * @description {Config} quickUndoUrl  
+             * {String} Url for undo-ing an event.
+             */
+            quickUndoUrl: "", 
+            /**
+             * @description {Config} quickRedoUrl  
+             * {String} Url for redo-ing an event.
+             */
+            quickRedoUrl: "", 
+            /**
              * @description {Config} autoload  
              * {Boolean} If event items is empty, and this param is set to true. 
              * Event will be retrieved by ajax call right after calendar is initialized.
@@ -720,9 +730,7 @@
             ht.push("</td>");
 
             var l = dayarrs.length;
-            var events_in_day=[];
             for (var i = 0; i < l; i++) {
-
                 ht.push("<td class=\"tg-col\" ch='qkadd' abbr='", dateFormat.call(dayarrs[i].date, i18n.xgcalendar.dateformat.fulldayvalue), "'>");
                 var istoday = dateFormat.call(dayarrs[i].date, "yyyyMMdd") == dateFormat.call(new Date(), "yyyyMMdd");
                 // Today
@@ -755,29 +763,10 @@
                 else {
                     c = tc(); //default theme
                 }
-
-                if(events[i].event[4]!=1 || events[i].event[5]!=1){
-                    if(!isOverlapped(events,i)){
-                        events[i].aQ=1;
-                        events[i].width=1;
-                        events[i].left=0;
-                    }
-
-                }
-
                 var tt = BuildDayEvent(c, events[i], i);
                 hv.push(tt);
             }
         }
-        function isOverlapped(events,ci){
-             for(var i=0; i<ci; i++){
-                 if(events[ci].st.p < events[i].et.p && events[ci].et.p> events[i].st.p){
-                     return true;
-                 }
-             }
-                 return false;
-        }
-
         function getTitle(event) {			
             var timeshow, locationshow, attendsshow, eventshow;
             var showtime = event[4] != 1;
@@ -803,7 +792,7 @@
             return ret.join("");
         }
         function BuildDayEvent(theme, e, index) {
-            var p = { bdcolor: theme[0], bgcolor2: theme[0], bgcolor1: theme[2], width: "100%", icon: "", title: "", data: "" };
+            var p = { bdcolor: theme[0], bgcolor2: theme[0], bgcolor1: theme[2], width: "70%", icon: "", title: "", data: "" };
             p.starttime = pZero(e.st.hour) + ":" + pZero(e.st.minute);
             p.endtime = pZero(e.et.hour) + ":" + pZero(e.et.minute);
             p.content = e.event[1];
@@ -1231,11 +1220,145 @@
                 alert("url" + i18n.xgcalendar.i_undefined);
             }
         }
+        function undo() {
+            if (option.isloading) {
+                return true;
+            }
+            if (option.quickUndoUrl && option.quickUndoUrl != "") {
+                option.isloading = true;
+                //clearcontainer();
+                if (option.onBeforeRequestData && $.isFunction(option.onBeforeRequestData)) {
+                    option.onBeforeRequestData(1);
+                }
+                var param = [
+                { name: "number", value: 1 },
+                ];
+				
+                $.ajax({
+                    type: option.method, //
+                    url: option.quickUndoUrl,
+                    data: param,				   
+			        //dataType: "text",  // fixed jquery 1.4 not support Ms Date Json Format /Date(@Tickets)/
+                    dataType: "json",
+                    dataFilter: function(data, type) { 
+                        //return data.replace(/"\\\/(Date\([0-9-]+\))\\\/"/gi, "new $1");
+                        
+                        return data;
+                      },
+                    success: function(data) {//function(datastr) {									
+						//datastr =datastr.replace(/"\\\/(Date\([0-9-]+\))\\\/"/gi, 'new $1');						
+                        //var data = (new Function("return " + datastr))();
+                        if (data != null && data.error != null) {
+                            if (option.onRequestDataError) {
+                                option.onRequestDataError(1, data);
+                            }
+                        }
+                        else {
+                            //data["start"] = parseDate(data["start"]);
+                            //data["end"] = parseDate(data["end"]);
+                            //$.each(data.events, function(index, value) { 
+                            //    value[2] = parseDate(value[2]);
+                            //    value[3] = parseDate(value[3]); 
+                            //});
+                            //responseData(data, data.start, data.end);
+                            //pushER(data.start, data.end);
+                        }
+                        if (option.onAfterRequestData && $.isFunction(option.onAfterRequestData)) {
+                            option.onAfterRequestData(1);
+                        }
+                        option.isloading = false;
+                    },
+                    error: function(data) {	
+						try {							
+                            if (option.onRequestDataError) {
+                                option.onRequestDataError(1, data);
+                            } else {
+                                alert(i18n.xgcalendar.get_data_exception);
+                            }
+                            if (option.onAfterRequestData && $.isFunction(option.onAfterRequestData)) {
+                                option.onAfterRequestData(1);
+                            }
+                            option.isloading = false;
+                        } catch (e) { }
+                    }
+                });
+            }
+            else {
+                alert("url" + i18n.xgcalendar.i_undefined);
+            }
+        }
+        function redo() {
+            if (option.isloading) {
+                return true;
+            }
+            if (option.quickRedoUrl && option.quickRedoUrl != "") {
+                option.isloading = true;
+                //clearcontainer();
+                if (option.onBeforeRequestData && $.isFunction(option.onBeforeRequestData)) {
+                    option.onBeforeRequestData(1);
+                }
+                var param = [
+                { name: "number", value: 1 },
+                ];
+				
+                $.ajax({
+                    type: option.method, //
+                    url: option.quickRedoUrl,
+                    data: param,				   
+			        //dataType: "text",  // fixed jquery 1.4 not support Ms Date Json Format /Date(@Tickets)/
+                    dataType: "json",
+                    dataFilter: function(data, type) { 
+                        //return data.replace(/"\\\/(Date\([0-9-]+\))\\\/"/gi, "new $1");
+                        
+                        return data;
+                      },
+                    success: function(data) {//function(datastr) {									
+						//datastr =datastr.replace(/"\\\/(Date\([0-9-]+\))\\\/"/gi, 'new $1');						
+                        //var data = (new Function("return " + datastr))();
+                        if (data != null && data.error != null) {
+                            if (option.onRequestDataError) {
+                                option.onRequestDataError(1, data);
+                            }
+                        }
+                        else {
+                            //data["start"] = parseDate(data["start"]);
+                            //data["end"] = parseDate(data["end"]);
+                            //$.each(data.events, function(index, value) { 
+                            //    value[2] = parseDate(value[2]);
+                            //    value[3] = parseDate(value[3]); 
+                            //});
+                            //responseData(data, data.start, data.end);
+                            //pushER(data.start, data.end);
+                        }
+                        if (option.onAfterRequestData && $.isFunction(option.onAfterRequestData)) {
+                            option.onAfterRequestData(1);
+                        }
+                        option.isloading = false;
+                    },
+                    error: function(data) {	
+						try {							
+                            if (option.onRequestDataError) {
+                                option.onRequestDataError(1, data);
+                            } else {
+                                alert(i18n.xgcalendar.get_data_exception);
+                            }
+                            if (option.onAfterRequestData && $.isFunction(option.onAfterRequestData)) {
+                                option.onAfterRequestData(1);
+                            }
+                            option.isloading = false;
+                        } catch (e) { }
+                    }
+                });
+            }
+            else {
+                alert("url" + i18n.xgcalendar.i_undefined);
+            }
+        }
         function responseData(data, start, end) {
             var events;
             if (data.issort == false) {
                 if (data.events && data.events.length > 0) {
-                    events = data.events.sort(function(l, r) { return l[2] < r[2] ? -1 : 1; });
+                    events = data.sort(function(l, r) { return l[2] > r[2] ? -1 : 1; });
                 }
                 else {
                     events = [];
@@ -1661,7 +1784,8 @@
             var left = offsetMe.left;
 
             var daystr = this.abbr;
-            var day = strtodate(daystr+" 00:00");
+            var arrdays = daystr.split('/');
+            var day = new Date(arrdays[0], parseInt(arrdays[1] - 1), arrdays[2]);
             var cc = $("#cal-month-cc");
             var ccontent = $("#cal-month-cc-content table tbody");
             var ctitle = $("#cal-month-cc-title");
@@ -2679,6 +2803,12 @@
             rf: function() {
                 populate();
             },
+            ud: function() {
+                undo();
+            },
+            rd: function() {
+                redo();
+            },
             gt: function(d) {
                 if (!d) {
                     d = new Date();
@@ -2754,6 +2884,28 @@
         return this.each(function() {
             if (this.bcal) {
                 this.bcal.rf();
+            }
+        })
+    };
+    
+    /**
+     * @description {Method} reload To undo last change.
+     */
+    $.fn.undo = function() {
+        return this.each(function() {
+            if (this.bcal) {
+                this.bcal.ud();
+            }
+        })
+    };
+
+    /**
+     * @description {Method} reload To redo last change.
+     */
+    $.fn.redo = function() {
+        return this.each(function() {
+            if (this.bcal) {
+                this.bcal.rd();
             }
         })
     };
